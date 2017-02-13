@@ -2,13 +2,13 @@ import express from 'express';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import session from 'express-session';
 import compress from 'compression';
 import methodOverride from 'method-override';
 import cors from 'cors';
 import httpStatus from 'http-status';
 import expressWinston from 'express-winston';
 import expressValidation from 'express-validation';
-import expressSession from 'express-session';
 import helmet from 'helmet';
 import winstonInstance from './winston';
 import routes from '../server/routes/index';
@@ -41,16 +41,16 @@ app.use(cors());
 app.enable('trust proxy');
 
 //enable session
-app.use(expressSession({
+app.use(session({
   secret: config.jwtSecret,
-  resave: false,
+  resave: true,
   saveUninitialized: true,
-  cookie: { secure: true }
+  cookie: {maxAge: 60000}
 }));
 
 //wrap to the data object
 const original = express.response.json;
-express.response.json = function(obj) {
+express.response.sendData = function (obj) {
   original.call(this, responseHelper.wrap(obj));
 };
 
@@ -111,7 +111,7 @@ if (config.env !== 'test') {
 
 // error handler, send stacktrace only during development
 app.use((err, req, res, next) => // eslint-disable-line no-unused-vars
-  res.status(err.status).json(err.serialize())
+  res.status(err.status).send(err.serialize())
 );
 
 export default app;

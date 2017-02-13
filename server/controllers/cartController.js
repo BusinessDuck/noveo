@@ -1,5 +1,7 @@
 import Cart from '../models/cart/cartModel';
 import Product from '../models/product/productModel';
+import APIError from '../helpers/APIError';
+import httpStatus from 'http-status';
 
 /**
  * List cart items
@@ -9,7 +11,7 @@ import Product from '../models/product/productModel';
  */
 function listCart(req, res, next) {
   let cart = new Cart(req.session.cart);
-  res.json(cart.serialize());
+  res.sendData(cart);
 }
 
 /**
@@ -20,15 +22,17 @@ function listCart(req, res, next) {
  */
 function addProduct(req, res, next) {
   let productId = req.body.id;
-  let cart = new Cart(req.session.cart ? req.session.cart : {items: {}});
+  let cart = new Cart(req.session.cart);
 
   Product.findOne({id: productId}, function (err, product) {
-    if (err) {
-      console.log(err);
+    if (!product) {
+      const apiError = new APIError("Product does not exists", httpStatus.NOT_FOUND);
+      return next(apiError);
+
     }
     cart.add(product, product.id);
-    req.session.cart = cart;
-    res.json(cart.serialize());
+    req.session.cart = cart.toSessionObject();
+    res.sendData(cart.serialize());
   });
 }
 
@@ -40,10 +44,15 @@ function addProduct(req, res, next) {
  */
 function reduceProduct(req, res, next) {
   let productId = req.params.id;
-  let cart = new Cart(req.session.cart ? req.session.cart : {items: {}});
-
-  cart.reduceByOne(productId);
-  req.session.cart = cart;
+  let cart = new Cart(req.session.cart);
+  try {
+    cart.reduceByOne(productId);
+  } catch (err) {
+    const apiError = new APIError(err.message, httpStatus.NOT_FOUND);
+    return next(apiError);
+  }
+  req.session.cart = cart.toSessionObject();
+  res.sendData(cart.serialize());
 }
 
 

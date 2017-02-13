@@ -20,6 +20,9 @@ export default class Cart {
   };
 
   reduceByOne = function (id) {
+    if (!this.items[id]) {
+      throw new Error("Product was not found in cart");
+    }
     this.items[id].qty--;
     this.items[id].price -= this.items[id].item.price;
     this.totalQty--;
@@ -29,12 +32,19 @@ export default class Cart {
       delete this.items[id];
     }
   };
-
+  toSessionObject = function () {
+    let {items, totalQty, totalPrice} = this;
+    return {
+      items,
+      totalQty,
+      totalPrice
+    }
+  };
   generateArray = function () {
     var arr = [];
 
     for (var id in this.items) {
-      arr.push(this.items[id]);
+      arr.push(this.items[id].item);
     }
 
     return arr;
@@ -46,6 +56,5 @@ export default class Cart {
     params["total_sum"] = this.totalPrice;
     params["products_count"] = this.totalQty;
     return params;
-  }
-
+  };
 }
