@@ -3,8 +3,8 @@
 
 Clone the repo:
 ```sh
-git clone https://github.com/rectius/express-rest-api.git
-cd express-rest-api
+git clone https://github.com/BusinessDuck/noveo.git
+cd noveo
 ```
 
 Install tools:
