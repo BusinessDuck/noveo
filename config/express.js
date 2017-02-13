@@ -8,6 +8,7 @@ import cors from 'cors';
 import httpStatus from 'http-status';
 import expressWinston from 'express-winston';
 import expressValidation from 'express-validation';
+import expressSession from 'express-session';
 import helmet from 'helmet';
 import winstonInstance from './winston';
 import routes from '../server/routes/index';
@@ -15,6 +16,7 @@ import config from './env';
 import APIError from '../server/helpers/APIError';
 import errorTypes from '../server/constants/ErrorTypes';
 import mongooseHelper from '../server/helpers/Mongoose';
+import responseHelper from '../server/helpers/responseHelper';
 
 const app = express();
 
@@ -37,6 +39,20 @@ app.use(helmet());
 app.use(cors());
 
 app.enable('trust proxy');
+
+//enable session
+app.use(expressSession({
+  secret: config.jwtSecret,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}));
+
+//wrap to the data object
+const original = express.response.json;
+express.response.json = function(obj) {
+  original.call(this, responseHelper.wrap(obj));
+};
 
 // enable detailed API logging in dev env
 if (config.env === 'development') {

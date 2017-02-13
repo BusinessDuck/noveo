@@ -13,3 +13,4 @@ router.route('/')
 router.route('/:id')
   .delete(cartController.reduceProduct);
 
+export default router;

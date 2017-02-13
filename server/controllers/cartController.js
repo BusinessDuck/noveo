@@ -8,15 +8,8 @@ import Product from '../models/product/productModel';
  * @param next
  */
 function listCart(req, res, next) {
-  let params = {};
-
-  if (req.session.cart) {
-    let cart = new Cart(req.session.cart);
-    params.products = cart.generateArray();
-    params.totalPrice = cart.totalPrice;
-  }
-
-  res.render('shop/shopping-cart', params);
+  let cart = new Cart(req.session.cart);
+  res.json(cart.serialize());
 }
 
 /**
@@ -26,7 +19,17 @@ function listCart(req, res, next) {
  * @param next
  */
 function addProduct(req, res, next) {
+  let productId = req.body.id;
+  let cart = new Cart(req.session.cart ? req.session.cart : {items: {}});
 
+  Product.findOne({id: productId}, function (err, product) {
+    if (err) {
+      console.log(err);
+    }
+    cart.add(product, product.id);
+    req.session.cart = cart;
+    res.json(cart.serialize());
+  });
 }
 
 /**
@@ -41,7 +44,6 @@ function reduceProduct(req, res, next) {
 
   cart.reduceByOne(productId);
   req.session.cart = cart;
-  res.redirect('/shopping-cart');
 }
 
 

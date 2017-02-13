@@ -10,6 +10,6 @@ router.get('/health-check', (req, res) =>
 );
 
 router.use('/products', productRoutes);
-router.use('/cart', productRoutes);
+router.use('/cart', cartRoutes);
 
 export default router;

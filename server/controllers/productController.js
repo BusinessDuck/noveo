@@ -29,9 +29,10 @@ function get(req, res) {
  */
 function create(req, res, next) {
   const product = new Product({
-    sum: req.body.sum,
+    price: req.body.price,
     quantity: req.body.quantity,
-    title: req.body.title
+    title: req.body.title,
+    description: req.body.description
   });
 
   product.save()

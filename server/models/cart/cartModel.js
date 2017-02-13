@@ -1,16 +1,16 @@
 export default class Cart {
-  constructor(oldCart){
+  constructor(oldCart = {}) {
     this.items = oldCart.items || {};
     this.totalQty = oldCart.totalQty || 0;
     this.totalPrice = oldCart.totalPrice || 0;
   }
 
-  add = function(item, id) {
+  add = function (item, id) {
     var storedItem = this.items[id];
 
     // in case an item has not yet been added to the cart
     if (!storedItem) {
-      storedItem = this.items[id] = { item: item, qty: 0, price: 0 };
+      storedItem = this.items[id] = {item: item, qty: 0, price: 0};
     }
 
     storedItem.qty++;
@@ -19,7 +19,7 @@ export default class Cart {
     this.totalPrice += storedItem.item.price;
   };
 
-  reduceByOne = function(id) {
+  reduceByOne = function (id) {
     this.items[id].qty--;
     this.items[id].price -= this.items[id].item.price;
     this.totalQty--;
@@ -30,7 +30,7 @@ export default class Cart {
     }
   };
 
-  generateArray = function() {
+  generateArray = function () {
     var arr = [];
 
     for (var id in this.items) {
@@ -38,6 +38,14 @@ export default class Cart {
     }
 
     return arr;
+  };
+
+  serialize = function () {
+    let params = {};
+    params.products = this.generateArray();
+    params["total_sum"] = this.totalPrice;
+    params["products_count"] = this.totalQty;
+    return params;
   }
 
 }

@@ -11,21 +11,24 @@ autoIncrement.initialize(mongoose.connection);
  * Product Schema
  */
 const options = {
-  toObject: {virtuals: true},
   toJSON: {virtuals: true}
 };
 
 const ProductSchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    required: true
+  },
   quantity: {
     type: Number,
     required: true
   },
   title: {
-    type: String
-  },
-  description: {
     type: String,
     required: true
+  },
+  description: {
+    type: String
   },
   price: {
     type: Number,
@@ -36,7 +39,7 @@ const ProductSchema = new mongoose.Schema({
     default: Date.now,
     select: false
   }
-}, options);
+});
 
 /**
  * Add your
